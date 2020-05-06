@@ -21,15 +21,10 @@ class Signup extends Component {
   handleChange = event => {
     this.setState({
       [event.target.name]: event.target.value,
-    });
-  };
-
-  onRadioChange = event => {
-    this.setState({
       role: event.target.value,
     });
-  }
-
+  };
+  
   handleSubmit = event => {
     event.preventDefault();
     console.log("sign-up handleSubmit, username: ");
@@ -182,21 +177,21 @@ class Signup extends Component {
                   value="artist"
                   label="artist"
                   checked={this.state.role === "artist"}
-                  onChange={this.onRadioChange}
+                  onChange={this.handleChange}
                 />
                 <Form.Check
                   type="radio"
                   value="promoter"
                   label="promoter"
                   checked={this.state.role === "promoter"}
-                  onChange={this.onRadioChange}
+                  onChange={this.handleChange}
                 />
                 <Form.Check
                   type="radio"
                   value="both"
                   label="both"
                   checked={this.state.role === "both"}
-                  onChange={this.onRadioChange}
+                  onChange={this.handleChange}
                 />
                 </Col>
               </Form.Group>
