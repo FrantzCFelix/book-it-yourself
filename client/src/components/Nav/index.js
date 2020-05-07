@@ -2,11 +2,9 @@ import React, { Component } from "react";
 import { Redirect, Link } from "react-router-dom";
 import axios from "axios";
 import { Nav, Navbar } from "react-bootstrap";
-import Home from "../../pages/Index";
 import Search from "../Search";
 import "./style.css";
 import Logo from "../../assets/images/logo.PNG";
-import API from "../../utils/API";
 
 class NavigationBar extends Component {
   constructor(props) {
@@ -60,7 +58,7 @@ class NavigationBar extends Component {
       });
   };
 
-  linkToPage = path => {
+  linkToPage = (path, blank) => {
     this.setState({
       redirect: path,
     });
@@ -69,6 +67,19 @@ class NavigationBar extends Component {
   render() {
     if (this.state.redirect) {
       const redir = this.state.redirect;
+      if (this.state.redirect === "/search") {
+        this.setState({ redirect: null });
+        return (
+          <Redirect
+            to={{
+              pathname: redir,
+              state: {
+                searchTerm: "search for users",
+              },
+            }}
+          />
+        );
+      }
       this.setState({ redirect: null });
       return <Redirect to={redir} />;
     }
@@ -97,55 +108,49 @@ class NavigationBar extends Component {
             id="responsive-navbar-nav"
           >
             <React.Fragment>
-              {/* <Nav.Link href="/profile">Profile</Nav.Link> */}
               <Link
+                className="d-block"
                 onClick={() => {
                   this.linkToPage(`/profile`);
                 }}
               >
                 Profile
               </Link>
-              {/* <Nav.Link href="/feed">Feed</Nav.Link> */}
               <Link
+                className="d-block"
                 onClick={() => {
                   this.linkToPage(`/feed`);
                 }}
               >
                 Feed
               </Link>
-              {/* <Nav.Link className="d-block d-sm-none" href="/search">
-                Search
-              </Nav.Link> */}
               <Link
+                className="d-block d-sm-none"
                 onClick={() => {
-                  this.linkToPage(`/search`);
+                  this.linkToPage(`/mobilesearch`, "");
                 }}
               >
                 Search
               </Link>
-              {/* <Nav.Link className="d-block d-sm-none" href="/calendar">
-                Calendar
-              </Nav.Link> */}
               <Link
+                className="d-block d-xl-none"
                 onClick={() => {
                   this.linkToPage(`/calendar`);
                 }}
               >
                 Calendar
               </Link>
-              {/* <Nav.Link className="d-block d-sm-none" href="/map">
-                Map
-              </Nav.Link> */}
               <Link
+                className="d-block d-xl-none"
                 onClick={() => {
                   this.linkToPage(`/map`);
                 }}
               >
                 Map
               </Link>
-              <Nav.Link to="/" onClick={this.logout}>
+              <Link className="d-block" to="/" onClick={this.logout}>
                 Sign out
-              </Nav.Link>
+              </Link>
             </React.Fragment>
           </Navbar.Collapse>
           <div className=" d-none d-sm-block justify-content-end">
@@ -181,9 +186,13 @@ class NavigationBar extends Component {
               <Nav.Link>
                 <Link to="/login">Login</Link>
               </Nav.Link>
-
               <Nav.Link>
                 <Link to="/signup">Signup</Link>
+              </Nav.Link>
+              <Nav.Link>
+                <Link to="/mobilesearch" className="d-block d-sm-none">
+                  Search
+                </Link>
               </Nav.Link>
             </React.Fragment>
           </Navbar.Collapse>

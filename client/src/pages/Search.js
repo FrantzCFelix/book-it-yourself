@@ -1,13 +1,8 @@
 import React, { Component } from "react";
-import { Route, BrowserRouter as Router, Switch } from "react-router-dom";
-import { Row, Col, Jumbotron, Container, Image } from "react-bootstrap";
+import { Redirect } from "react-router-dom";
+import { Row, Col, Jumbotron } from "react-bootstrap";
 import Nav from "../components/Nav";
-import axios from "axios";
-import Main from "../pages/Main";
-import Home from "../pages/Index";
 import API from "../utils/API";
-import image from "../assets/images/userTest.png";
-import ProfileComponent from "../components/ProfileComponent";
 import SideFeedComponent from "../components/SideFeedComponent";
 
 class Search extends Component {
@@ -15,12 +10,21 @@ class Search extends Component {
     super(props);
     this.state = {
       users: [],
+      redirect: null,
+      username: null,
+      userID: null,
     };
   }
 
   componentDidMount() {
     this.setSearchTerm();
   }
+  handleUserChoice = chosenUser => {
+    this.setState({
+      redirect: `/userdetails`,
+      userID: chosenUser,
+    });
+  };
 
   setSearchTerm = search => {
     if (search) {
@@ -42,19 +46,44 @@ class Search extends Component {
 
   render() {
     // console.log(this.props.location.pathname);
+    if (this.state.redirect) {
+      const redir = this.state.redirect;
+      this.setState({ redirect: null });
+      return (
+        <Redirect
+          to={{
+            pathname: redir,
+            state: {
+              userID: this.state.userID,
+            },
+          }}
+        />
+      );
+    }
 
     return (
       <div>
         <Nav setSearchTerm={this.setSearchTerm} />
         <Row>
-          <Col sm={4}>
-            <SideFeedComponent />
+          <Col xl={4}>
+            <div className="d-none d-xl-block">
+              <SideFeedComponent />
+            </div>
           </Col>
-          <Col sm={8} xs={12}>
+          <Col xl={8}>
             <Jumbotron fluid>
               <p>search page</p>
               {this.state.users.length > 0
-                ? this.state.users.map(user => <p>{user.username}</p>)
+                ? this.state.users.map(user => (
+                    <p
+                      id={user._id}
+                      onClick={event => {
+                        this.handleUserChoice(event.target.id);
+                      }}
+                    >
+                      {user.username}
+                    </p>
+                  ))
                 : null}
             </Jumbotron>
           </Col>

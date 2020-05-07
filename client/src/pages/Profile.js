@@ -1,12 +1,8 @@
 import React, { Component } from "react";
-import { Route, BrowserRouter as Router, Switch } from "react-router-dom";
-import { Row, Col, Jumbotron, Container, Image } from "react-bootstrap";
+import { Row, Col, Jumbotron, Container } from "react-bootstrap";
 import Nav from "../components/Nav";
 import axios from "axios";
-import Main from "../pages/Main";
-import Home from "../pages/Index";
 import API from "../utils/API";
-import image from "../assets/images/userTest.png";
 import ProfileComponent from "../components/ProfileComponent";
 import SideFeedComponent from "../components/SideFeedComponent";
 
@@ -25,8 +21,47 @@ class Profile extends Component {
     this.getUser();
   };
 
+  deletePost = (id, author) => {
+    API.deletePost(id)
+      .then(data => {
+        API.updateRemoveUserPost(author, {
+          id: data.data._id,
+        })
+          .then(data => {
+            console.log(data);
+            this.getUser();
+          })
+          .catch(err => console.error(err));
+      })
+      .catch(err => console.error(err));
+  };
+
+  togglePostStatus = (id, status) => {
+    let newStatus;
+    if (status === `open`) {
+      newStatus = true;
+    } else if (status === `closed`) {
+      newStatus = false;
+    }
+    API.updatePost(id, { complete: newStatus })
+      .then(data => {
+        console.log(data);
+        this.getUser();
+      })
+      .catch(err => console.error(err));
+  };
+
   updateUser = userObject => {
     this.setState(userObject);
+  };
+
+  editStatus = (id, status) => {
+    API.updateUser(id, { status: status })
+      .then(data => {
+        console.log(data);
+        this.getUser();
+      })
+      .catch(err => console.error(err));
   };
 
   getUser = () => {
@@ -73,15 +108,20 @@ class Profile extends Component {
       <div>
         <Nav />
         <Row>
-          <Col sm={4}>
-            <SideFeedComponent />
+          <Col xl={4}>
+            <div className="d-none d-xl-block">
+              <SideFeedComponent />
+            </div>
           </Col>
-          <Col sm={8} xs={12}>
+          <Col xl={8}>
             <Jumbotron fluid>
               <Container>
-                {/* {this.state.user.username !== undefined ? ( */}
                 <div>
                   <ProfileComponent
+                    deletePost={this.deletePost}
+                    togglePostStatus={this.togglePostStatus}
+                    editStatus={this.editStatus}
+                    userId={this.state.user.id}
                     username={this.state.user.username}
                     location={this.state.user.location}
                     email={this.state.user.email}
@@ -91,7 +131,6 @@ class Profile extends Component {
                     posts={this.state.user.posts}
                   />
                 </div>
-                {/* ) : null} */}
               </Container>
             </Jumbotron>
           </Col>

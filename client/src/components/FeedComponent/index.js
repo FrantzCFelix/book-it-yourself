@@ -1,11 +1,11 @@
 import React, { Component } from "react";
 import { Jumbotron, Row, Col, Container } from "react-bootstrap";
-import NameCard from "../NameCard";
 import FeedCard from "../FeedCard";
 import Nav from "../Nav";
 import SideFeedComponent from "../SideFeedComponent";
 import axios from "axios";
 import API from "../../utils/API";
+import { Link, Redirect } from "react-router-dom";
 
 class FeedComponent extends Component {
   constructor(props) {
@@ -19,6 +19,8 @@ class FeedComponent extends Component {
         { filterTerm: `artistNeeded`, displayTerm: `Artist Needed` },
         { filterTerm: `showNeeded`, displayTerm: `Show Needed` },
       ],
+      locationSearch: ``,
+      redirect: null,
     };
   }
 
@@ -32,26 +34,29 @@ class FeedComponent extends Component {
     this.setState({ filteredPosts: filtered });
   };
 
+  filterByLocation = location => {
+    const filtered = this.state.posts.filter(
+      post => post.location.toLowerCase().indexOf(location.toLowerCase()) !== -1
+    );
+    this.setState({ filteredPosts: filtered });
+  };
+
   resetPosts = () => {
     this.setState({ filteredPosts: this.state.posts });
   };
-
-  //   author: "5ea863ce84d81942203caba9"
-  // complete: false
-  // description: "Looking for a show, any ideas please get in touch!"
-  // endDate: "2020-01-01T00:00:00.000Z"
-  // location: "Seattle"
-  // postedDate: "2020-05-06T20:21:49.558Z"
-  // startDate: "2019-01-01T00:00:00.000Z"
-  // title: "Looking for a show"
-  // type: "artistNeeded"
-  // _id: "5ea866f6298ddd2a5c1de8fc"
 
   getPosts = () => {
     API.getPosts()
       .then(response => {
         console.log(response.data);
-        this.setState({ posts: response.data, filteredPosts: response.data });
+        const sortedPosts = response.data
+          .filter(
+            post =>
+              post.complete === false && new Date(post.endDate) > new Date()
+          )
+          .sort((a, b) => (b.startDate > a.startDate ? 1 : -1));
+
+        this.setState({ posts: sortedPosts, filteredPosts: sortedPosts });
       })
       .catch(err => console.error(err));
   };
@@ -76,18 +81,57 @@ class FeedComponent extends Component {
   };
 
   render() {
+    if (this.state.redirect) {
+      const redir = this.state.redirect;
+      this.setState({ redirect: null });
+      return <Redirect to={redir} />;
+    }
     return (
       <div>
         <Nav />
         <Row>
-          <Col sm={4}>
-            <SideFeedComponent />
+          <Col xl={4}>
+            <div className="d-none d-xl-block">
+              <SideFeedComponent />
+            </div>
           </Col>
-          <Col sm={8} xs={12}>
+          <Col xl={8}>
             <Jumbotron fluid>
               <Container>
-                <h1>Posts</h1>
+                <h1>Posts</h1>{" "}
+                <Link
+                  onClick={() => {
+                    this.setState({ redirect: `/post` });
+                  }}
+                >
+                  Make a post
+                </Link>
                 <h3>Filter:</h3>
+                <form
+                  id="location-search"
+                  onSubmit={event => {
+                    event.preventDefault();
+                    const location = this.state.locationSearch;
+                    this.setState({ locationSearch: `` });
+                    if (location === ``) {
+                      this.resetPosts();
+                    } else {
+                      this.filterByLocation(location);
+                    }
+                  }}
+                >
+                  <label htmlFor="post-location">
+                    For where are you searching?
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Search for a location"
+                    onChange={event => {
+                      this.setState({ locationSearch: event.target.value });
+                    }}
+                  />
+                  <button type="submit">Search</button>
+                </form>
                 <form id="select-post-type">
                   <label htmlFor="post-types">What kind of post?</label>
                   <select
@@ -113,11 +157,12 @@ class FeedComponent extends Component {
                     })}
                   </select>
                 </form>
-
                 {this.state.filteredPosts.length > 0
                   ? this.state.filteredPosts.map((post, index) => {
                       return (
                         <FeedCard
+                          author={post.author}
+                          name={post.name}
                           key={index}
                           title={post.title}
                           location={post.location}

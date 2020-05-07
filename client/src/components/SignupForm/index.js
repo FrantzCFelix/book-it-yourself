@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Redirect, Route } from "react-router-dom";
+import { Redirect } from "react-router-dom";
 import axios from "axios";
 import { Form, Button, Row, Col } from "react-bootstrap";
 import SideFeedComponent from "../SideFeedComponent";
@@ -11,10 +11,14 @@ class Signup extends Component {
     this.state = {
       username: "",
       password: "",
-      role: [],
-      confirmPassword: "",
+      email: "",
+      role: "",
       loggedIn: false,
       redirect: null,
+      usernameError: "",
+      passwordError: "",
+      emailError: "",
+      roleError: "",
     };
   }
 
@@ -38,40 +42,98 @@ class Signup extends Component {
     }
   };
 
-  handleSubmit = event => {
-    event.preventDefault();
-    console.log("sign-up handleSubmit, username: ");
-    console.log(this.state.username);
-    console.log(this.state);
+  validate = (userExists) => {
+    let usernameError = "";
+    let passwordError = "";
+    let emailError = "";
+    let roleError = "";
 
-    //request to server to add a new username/password
-    axios
-      .post("/api/user/", {
-        username: this.state.username,
-        password: this.state.password,
-        location: this.state.location,
-        telephone: this.state.telephone,
-        email: this.state.email,
-        role: this.state.role,
-      })
-      .then(response => {
-        console.log(response);
-        if (!response.data.errmsg) {
-          console.log("successful signup");
-          this.setState({
-            loggedIn: true,
-            redirect: `/login`,
-          });
-        } else {
-          console.log("username already taken");
-        }
-      })
-      .catch(error => {
-        console.log("signup error: ");
-        console.log(error);
-      });
+    if (userExists) {
+      usernameError = "username already in use";
+    }
+
+    if (this.state.username.length < 4) {
+      usernameError = "four characters required";
+    }
+
+    if (this.state.username.includes(" ")) {
+      usernameError = "cannot contain spaces";
+    }
+
+    if (this.state.password.length < 4) {
+      passwordError = "four characters required";
+    }
+
+    if (this.state.password.includes(" ")) {
+      passwordError = "cannot contain spaces";
+    }
+
+    if (this.state.email.length < 6) {
+      emailError = "invalid email address";
+    }
+
+    if (this.state.email.includes(" ")) {
+      emailError = "invalid email address";
+    }
+
+    if (!this.state.email.includes("@")) {
+      emailError = "invalid email address";
+    }
+
+    if (!this.state.email.includes(".")) {
+      emailError = "invalid email address";
+    }
+
+    if (this.state.role === "") {
+      roleError = "check at least one box";
+    }
+
+    if (usernameError || passwordError || emailError || roleError) {
+      this.setState({ usernameError, passwordError, emailError, roleError });
+      return false;
+    }
+
+    return true;
   };
 
+  handleSubmit = event => {
+    event.preventDefault();
+    let userExists = false;
+    axios
+      .get("/api/users/", {})
+      .then(response => {
+        for (let i = 0; i < response.data.length; ++i) {
+          if (this.state.username === response.data[i].username) {
+            // eslint-disable-next-line no-unused-expressions
+            userExists = true;
+          }
+        }
+        if (this.validate(userExists) && !userExists) {
+        axios
+          .post("/api/user/", {
+            username: this.state.username.toLowerCase(),
+            password: this.state.password,
+            location: this.state.location.toLowerCase(),
+            telephone: this.state.telephone,
+            email: this.state.email.toLowerCase(),
+            role: this.state.role,
+          })
+          .then(response => {
+            console.log(response);
+            if (!response.data.errmsg) {
+              this.setState({
+                loggedIn: true,
+                redirect: `/login`,
+              });
+            }
+          })
+          .catch(error => {
+            console.log(error);
+          });
+        }
+      }
+    )
+  }
   render() {
     if (this.state.redirect) {
       return <Redirect to={this.state.redirect} />;
@@ -81,10 +143,12 @@ class Signup extends Component {
       <div>
         <Nav />
         <Row>
-          <Col sm={4}>
-            <SideFeedComponent />
+          <Col xl={4}>
+            <div className="d-none d-xl-block">
+              <SideFeedComponent />
+            </div>
           </Col>
-          <Col sm={8} xs={12}>
+          <Col xl={8}>
             <Form>
               <h3>Create Account</h3>
               <Form.Group
@@ -103,6 +167,9 @@ class Signup extends Component {
                     value={this.state.username}
                     onChange={this.handleChange}
                   />
+                  <div style={{ fontSize: 10, color: "red" }}>
+                    {this.state.usernameError}
+                  </div>
                 </Col>
               </Form.Group>
               <Form.Group
@@ -120,6 +187,9 @@ class Signup extends Component {
                     value={this.state.password}
                     onChange={this.handleChange}
                   />
+                  <div style={{ fontSize: 10, color: "red" }}>
+                    {this.state.passwordError}
+                  </div>
                 </Col>
               </Form.Group>
               <Form.Group
@@ -174,6 +244,9 @@ class Signup extends Component {
                     value={this.state.email}
                     onChange={this.handleChange}
                   />
+                  <div style={{ fontSize: 10, color: "red" }}>
+                    {this.state.emailError}
+                  </div>
                 </Col>
               </Form.Group>
               <Form.Group
@@ -197,6 +270,9 @@ class Signup extends Component {
                     label="promoter"
                     onChange={event => this.handleCheck(event, `promoter`)}
                   />
+                  <div style={{ fontSize: 10, color: "red" }}>
+                    {this.state.roleError}
+                  </div>
                 </Col>
               </Form.Group>
 

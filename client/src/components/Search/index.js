@@ -2,10 +2,7 @@ import React, { Component } from "react";
 import { Redirect } from "react-router-dom";
 import InputGroup from "react-bootstrap/InputGroup";
 import FormControl from "react-bootstrap/FormControl";
-import Button from "react-bootstrap/Button";
-import API from "../../utils/API";
-
-class Search extends Component {
+import Button from "react-bootstrap/Button";class Search extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -40,7 +37,18 @@ class Search extends Component {
           size="sm"
           placeholder="Search Users"
           className="mr-sm-2"
-          onChange={event => this.handleSearchTermChange(event)}
+          onChange={event => {
+            this.handleSearchTermChange(event);
+          }}
+          onKeyUp={event => {
+            if (event.keyCode === 13) {
+              if (window.location.pathname === `/search`) {
+                this.props.setSearchTerm(this.state.searchTerm);
+              } else {
+                this.setState({ redirect: `/search` });
+              }
+            }
+          }}
         />
         <InputGroup.Append>
           <Button
