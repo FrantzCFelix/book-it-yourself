@@ -1,10 +1,7 @@
 import React, { Component } from "react";
 import GoogleMapReact from 'google-map-react';
 import Jumbotron from "react-bootstrap/Jumbotron";
-import MapTest from "../../assets/images/mapTest.jpg";
 
-
-const AnyReactComponent = ({ text }) => <div>{text}</div>;
 
 class Map extends Component {
 
@@ -13,8 +10,8 @@ class Map extends Component {
 
     this.state = {
       center: {
-        lat: -47.6062,
-        lng: 122.3321,
+        lat: 35.6762,
+        lng: 139.6503,
       },
       zoom: 11,
     };
@@ -47,6 +44,7 @@ class Map extends Component {
           lat: position.coords.latitude,
           lng: position.coords.longitude,
         };
+        console.log(pos);
         this.setState({center: pos});
       }, () => {
         console.log(`true`);
@@ -65,16 +63,15 @@ class Map extends Component {
       <Jumbotron>
         <div style={{ height: `50vh`, width: `100%` }}>
           <GoogleMapReact
+          // Added This line as a temp 'hacky' fix. To avoid this error when hovering over the map.
+          // Cannot read property 'x' of undefined error for basic example when moving mouse over map
+            // eslint-disable-next-line no-empty-function
+            distanceToMouse={() => {}}
             bootstrapURLKeys={{ key: `AIzaSyA7Wxb7HnT4rc08hFfYfwrurjFkRRLSRkA`}}
 
             defaultCenter={this.state.center}
             defaultZoom={this.state.zoom}
           >
-            <AnyReactComponent
-              lat={47.6062}
-              lng={-122.3321}
-              text="My Marker"
-            />
           </GoogleMapReact>
         </div>
       </Jumbotron>
