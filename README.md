@@ -32,7 +32,12 @@ This app runs in the browser - see [Setup](#setup) below for instructions on how
 
 ## Technologies
 
-This app was built with React.
+This app was built with :
+
+- [MongoDB] (https://www.mongodb.com/)
+- [Express](https://expressjs.com/)
+- [React](https://reactjs.org/)
+- [Node](https://nodejs.org/en/)
 
 ### Back-end package.json dependencies:
 
@@ -151,6 +156,25 @@ If the user has forked the repo and wants to see the code and potentially make c
 ## Features
 
 This Progressive Web Application has offline abilities, is responsive and features encrypted user passwords.
+
+We start by checking the database for a user matching the given username. If a user with given username is found, the retrieved user’s password is compared to the one provided. 
+
+```js
+  User.findOne({ username: username }, (err, user) => {
+    if (err) {
+      return done(err);
+    }
+    if (!user) {
+      return done(null, false, { message: `Incorrect username` });
+    }
+    if (!user.checkPassword(password)) {
+      return done(null, false, { message: `Incorrect password` });
+    }
+    return done(null, user);
+  });
+```
+
+Once the user is logged in, ........
 
 Maps.......
 
