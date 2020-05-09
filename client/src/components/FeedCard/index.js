@@ -34,10 +34,10 @@ class FeedCard extends Component {
 
     return (
       <Jumbotron>
-        <Card style={{ width: "auto" }}>
+        <Card style={{ width: `auto` }}>
           <Card.Body>
             <h1>{this.props.title}</h1>
-            {this.props.name ? (
+            {this.props.name ?
               <button
                 onClick={() => {
                   this.setState({
@@ -48,8 +48,8 @@ class FeedCard extends Component {
               >
                 {`Contact ${this.props.name}`}
               </button>
-            ) : null}
-            {this.props.delete ? (
+              : null}
+            {this.props.delete ?
               <button
                 onClick={() =>
                   this.props.deletePost(this.props.id, this.props.author)
@@ -57,8 +57,8 @@ class FeedCard extends Component {
               >
                 DELETE
               </button>
-            ) : null}
-            {this.props.delete && this.props.complete !== `negative` ? (
+              : null}
+            {this.props.delete && this.props.complete !== `negative` ?
               <div>
                 <button
                   onClick={() =>
@@ -72,17 +72,17 @@ class FeedCard extends Component {
                 </button>
                 <p>Status: {this.props.complete}</p>
               </div>
-            ) : null}
-            <p>Location: {this.props.location}.</p>
+              : null}
+            <p>city: {this.props.city}</p>
             <p>
-              When:{" "}
+              When:{` `}
               {`${
                 startDate.getMonth() + 1
               }/${startDate.getDate()}/${startDate.getFullYear()}`}
               {this.props.endDate !== ``
                 ? ` until ${`${
-                    endDate.getMonth() + 1
-                  }/${endDate.getDate()}/${endDate.getFullYear()}`}`
+                  endDate.getMonth() + 1
+                }/${endDate.getDate()}/${endDate.getFullYear()}`}`
                 : null}
               .
             </p>

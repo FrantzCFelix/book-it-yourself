@@ -34,9 +34,9 @@ class FeedComponent extends Component {
     this.setState({ filteredPosts: filtered });
   };
 
-  filterByLocation = location => {
+  filterByLocation = city => {
     const filtered = this.state.posts.filter(
-      post => post.location.toLowerCase().indexOf(location.toLowerCase()) !== -1
+      post => post.city.toLowerCase().indexOf(city.toLowerCase()) !== -1
     );
     this.setState({ filteredPosts: filtered });
   };
@@ -111,12 +111,12 @@ class FeedComponent extends Component {
                   id="location-search"
                   onSubmit={event => {
                     event.preventDefault();
-                    const location = this.state.locationSearch;
+                    const city = this.state.locationSearch;
                     this.setState({ locationSearch: `` });
-                    if (location === ``) {
+                    if (city === ``) {
                       this.resetPosts();
                     } else {
-                      this.filterByLocation(location);
+                      this.filterByLocation(city);
                     }
                   }}
                 >
@@ -165,7 +165,7 @@ class FeedComponent extends Component {
                           name={post.name}
                           key={index}
                           title={post.title}
-                          location={post.location}
+                          city={post.city}
                           startDate={post.startDate}
                           endDate={post.endDate}
                           description={post.description}
