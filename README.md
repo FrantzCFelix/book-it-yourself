@@ -1,6 +1,8 @@
 # Book-It-Yourself
 
 ### UML
+![BIYUML](https://user-images.githubusercontent.com/56744605/81463819-67fa2480-9171-11ea-94e2-08c4b4ab895c.png)
+
 
 ![Homepage](./public/assets/images/screenshots/UML.png)
 
